@@ -58,9 +58,10 @@ El despliegue se realizó de forma automatizada mediante el siguiente comando en
 ```bash
 docker compose up -d
 
+```
 Este proceso inicializa de forma aislada el servidor de aplicaciones y los servicios de base de datos necesarios, permitiendo que el frontend se conecte al puerto 3000 de forma inmediata y estable.
 
-```
+
 
 ## Interfaz y Experiencia de Usuario (UI/UX)
 
