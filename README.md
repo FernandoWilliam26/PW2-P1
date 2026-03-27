@@ -1,43 +1,78 @@
-# Svelte + Vite
+# Proyecto E-Commerce - Frontend con Svelte 5
 
-This template should help get you started developing with Svelte in Vite.
+Esta aplicación consiste en una interfaz de gestión de productos moderna desarrollada para la asignatura de Programación Web. El proyecto utiliza la versión más reciente de **Svelte 5** para la gestión del estado y se integra con un entorno de servidor desplegado mediante contenedores.
 
-## Recommended IDE Setup
+---
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+## Implementación de Svelte 5 (Runas)
 
-## Need an official Svelte framework?
+Se han utilizado las nuevas **runas** de Svelte 5 para centralizar la lógica de reactividad, logrando un código más limpio y eficiente:
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+### $state
+Se emplea para definir el estado fundamental de la aplicación que requiere cambios en tiempo real.
+* **store.svelte.js**: Almacena de forma global el token de sesión y los datos de perfil del usuario.
+* **Productos.svelte**: Gestiona el listado dinámico de productos y la cadena de texto del buscador.
+* **Login.svelte**: Controla los campos de entrada y la gestión de mensajes de error de acceso.
+* **ProductForm.svelte**: Maneja el estado temporal de los inputs antes de confirmar una operación de guardado.
 
-## Technical considerations
+### $derived
+Se utiliza para realizar cálculos automáticos que dependen de otros estados, optimizando el rendimiento.
+* **Productos.svelte**: Implementa el filtrado del catálogo en tiempo real y el contador total de artículos disponibles.
+* **ProductCard.svelte**: Normaliza la propiedad de estado activo, asegurando que se interprete correctamente independientemente del formato en que llegue del servidor.
+* **Perfil.svelte**: Deriva el nombre del usuario desde el estado global para su visualización.
 
-**Why use this over SvelteKit?**
+### $effect
+Se usa para gestionar la sincronización con servicios externos y efectos secundarios.
+* **App.svelte**: Supervisa el estado de la sesión para proteger las rutas privadas y gestionar redirecciones.
+* **Productos.svelte**: Inicia la petición de datos al backend en el momento en que se carga la vista del catálogo.
+* **ProductForm.svelte**: Sincroniza automáticamente los datos del formulario cuando se selecciona un producto para su edición.
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+### $props
+Sustituye a la comunicación tradicional entre componentes, permitiendo un flujo de datos más claro.
+* **Componentes de interfaz**: Se utiliza en las tarjetas de productos y formularios para recibir datos y funciones de retorno (callbacks) desde los componentes padres.
 
-This template contains as little as possible to get started with Vite + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+---
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+## Integración con el Backend
 
-**Why include `.vscode/extensions.json`?**
+La aplicación se comunica con una API REST profesional que gestiona la persistencia de datos y la seguridad mediante JWT.
 
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
+### Endpoints y Roles Utilizados
 
-**Why enable `checkJs` in the JS template?**
+| Método | Endpoint | Propósito | Requisito de Acceso |
+| :--- | :--- | :--- | :--- |
+| **POST** | /api/login | Autenticación y entrega de credenciales. | Público |
+| **GET** | /api/productos | Obtención del catálogo completo. | Usuario Logueado |
+| **POST** | /api/productos | Registro de nuevos productos. | Administrador |
+| **PUT** | /api/productos/:id | Actualización de productos existentes. | Administrador |
+| **DELETE** | /api/productos/:id | Eliminación de registros. | Administrador |
 
-It is likely that most cases of changing variable types in runtime are likely to be accidental, rather than deliberate. This provides advanced typechecking out of the box. Should you like to take advantage of the dynamically-typed nature of JavaScript, it is trivial to change the configuration.
+---
 
-**Why is HMR not preserving my local component state?**
+## Despliegue del Backend (Docker)
 
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/sveltejs/svelte-hmr/tree/master/packages/svelte-hmr#preservation-of-local-state).
+Para asegurar un entorno de ejecución idéntico al del servidor de producción, el backend se levantó utilizando la configuración de contenedores proporcionada por el profesor.
 
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
+El despliegue se realizó de forma automatizada mediante el siguiente comando en la terminal:
 
-```js
-// store.js
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
+```bash
+docker compose up -d
+
+Este proceso inicializa de forma aislada el servidor de aplicaciones y los servicios de base de datos necesarios, permitiendo que el frontend se conecte al puerto 3000 de forma inmediata y estable.
+
 ```
+
+## Interfaz y Experiencia de Usuario (UI/UX)
+
+El diseño de la aplicación se ha centrado en ofrecer una herramienta de administración funcional y visualmente equilibrada:
+
+Arquitectura Visual: Se ha implementado un fondo basado en luces radiales suaves para evitar la fatiga visual, junto con una barra de navegación superior que utiliza desenfoque de fondo para aportar profundidad.
+
+Optimización de Procesos: El buscador de productos funciona mediante lógica reactiva, permitiendo localizar cualquier artículo al instante sin necesidad de recargar la página o realizar peticiones adicionales.
+
+Consistencia de Datos: La interfaz incluye una capa de limpieza de datos que garantiza que la información mostrada sea coherente, incluso si existen variaciones en los formatos de respuesta del servidor.
+
+Adaptabilidad: El catálogo utiliza un sistema de rejilla flexible que se ajusta automáticamente al tamaño de la pantalla, garantizando una experiencia fluida tanto en dispositivos móviles como en ordenadores de sobremesa.
+
+Tecnologías: Svelte 5, Vite, Docker Compose, JSON Web Tokens.
+
