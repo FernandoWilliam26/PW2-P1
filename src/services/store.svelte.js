@@ -2,11 +2,11 @@
 
 // Usamos $state() para manejar el estado principal de la aplicación [cite: 31]
 export const appState = $state({
-  user: null,    // Aquí guardaremos los datos del usuario cuando haga login
-  token: null,   // Aquí guardaremos el "pase VIP" (JWT) [cite: 14]
-  products: []   // Aquí guardaremos la lista de productos [cite: 31]
+  user: null,    
+  token: null,   
+  products: []   
 });
 
-// Usamos $derived() para saber si estamos autenticados [cite: 32]
-// Esto se actualizará automáticamente si el token cambia
-export const isAuthenticated = $derived(() => appState.token !== null);
+// En Svelte 5, una función normal que lee un $state ya es reactiva por defecto.
+// Así evitamos el error de exportación del $derived.
+export const isAuthenticated = () => appState.token !== null;

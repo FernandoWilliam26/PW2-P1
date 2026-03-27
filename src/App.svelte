@@ -1,89 +1,103 @@
 <script>
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from './assets/vite.svg'
-  import heroImg from './assets/hero.png'
-  import Counter from './lib/Counter.svelte'
+  import { isAuthenticated, appState } from './services/store.svelte.js';
+  import Login from './pages/Login.svelte';
+  import Productos from './pages/Productos.svelte';
+  import Perfil from './pages/Perfil.svelte'; 
+
+  let rutaActual = $state('productos');
 </script>
 
-<section id="center">
-  <div class="hero">
-    <img src={heroImg} class="base" width="170" height="179" alt="" />
-    <img src={svelteLogo} class="framework" alt="Svelte logo" />
-    <img src={viteLogo} class="vite" alt="Vite logo" />
+<main>
+  {#if isAuthenticated()}
+    <nav class="navbar">
+      <div class="brand">TwinS<span>antander</span>.</div>
+      <div class="links">
+        <button 
+          class={rutaActual === 'productos' ? 'activa' : ''} 
+          onclick={() => rutaActual = 'productos'}>
+          📦 Productos
+        </button>
+        <button 
+          class={rutaActual === 'perfil' ? 'activa' : ''} 
+          onclick={() => rutaActual = 'perfil'}>
+          👤 Perfil
+        </button>
+      </div>
+      <button class="logout-btn" onclick={() => { appState.token = null; appState.user = null; }}>
+        Cerrar Sesión
+      </button>
+    </nav>
+  {/if}
+  
+  <div class="contenido">
+    {#if !isAuthenticated()}
+      <Login />
+    {:else if rutaActual === 'productos'}
+      <Productos />
+    {:else if rutaActual === 'perfil'}
+      <Perfil />
+    {/if}
   </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/App.svelte</code> and save to test <code>HMR</code></p>
-  </div>
-  <Counter />
-</section>
+</main>
 
-<div class="ticks"></div>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap');
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#documentation-icon"></use>
-    </svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank" rel="noreferrer">
-          <img class="logo" src={viteLogo} alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://svelte.dev/" target="_blank" rel="noreferrer">
-          <img class="button-icon" src={svelteLogo} alt="" />
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#social-icon"></use>
-    </svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li>
-        <a href="https://github.com/vitejs/vite" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#github-icon"></use>
-          </svg>
-          GitHub
-        </a>
-      </li>
-      <li>
-        <a href="https://chat.vite.dev/" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#discord-icon"></use>
-          </svg>
-          Discord
-        </a>
-      </li>
-      <li>
-        <a href="https://x.com/vite_js" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#x-icon"></use>
-          </svg>
-          X.com
-        </a>
-      </li>
-      <li>
-        <a href="https://bsky.app/profile/vite.dev" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#bluesky-icon"></use>
-          </svg>
-          Bluesky
-        </a>
-      </li>
-    </ul>
-  </div>
-</section>
+  :global(body) {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    color: #1e293b;
+    min-height: 100vh;
+    background-color: #f8fafc;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.05) 0px, transparent 50%);
+    background-attachment: fixed;
+  }
 
-<div class="ticks"></div>
-<section id="spacer"></section>
+
+  .navbar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255, 255, 255, 0.7); 
+    backdrop-filter: blur(20px); 
+    padding: 0.8rem 5%;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-top: 4px solid #4f46e5; 
+    position: sticky; top: 0; z-index: 100;
+  }
+
+  .brand { 
+    font-size: 1.6rem; 
+    font-weight: 800; 
+    color: #111827;
+    letter-spacing: -1px;
+  }
+  .brand span { color: #4f46e5; } 
+
+  .links { display: flex; gap: 0.5rem; }
+  
+  .links button {
+    background: transparent; border: none; font-size: 1rem; cursor: pointer;
+    padding: 0.5rem 1.2rem; border-radius: 30px; transition: all 0.3s ease;
+    color: #64748b; font-weight: 600;
+  }
+  
+  .links button:hover { color: #111827; }
+  
+  .links button.activa { 
+    background: #111827; color: white; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  
+  .logout-btn { 
+    background-color: transparent; color: #ef4444; 
+    border: 1px solid #fee2e2; padding: 0.5rem 1.2rem; 
+    border-radius: 30px; cursor: pointer; font-weight: 600;
+    transition: all 0.2s;
+  }
+  .logout-btn:hover { background-color: #fee2e2; }
+
+  .contenido { padding: 2rem 5%; max-width: 1200px; margin: 0 auto; }
+</style>
